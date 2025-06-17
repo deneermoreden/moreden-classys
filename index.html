@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>슈링크 유니버스 투자 수익 분석 대시보드</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .metric-card {
+            transition: transform 0.2s ease-in-out;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+        .slider-container {
+            position: relative;
+        }
+        .slider-value {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4f46e5;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-6">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-bold text-center mb-2">
+                <i class="fas fa-calculator mr-3"></i>슈링크 유니버스 투자 수익 분석
+            </h1>
+            <p class="text-center text-blue-100">치과 원장님을 위한 실시간 ROI 계산 대시보드</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- 변수 설정 섹션 -->
+        <div class="bg-white rounded-lg card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                <i class="fas fa-sliders-h text-indigo-600 mr-2"></i>변수 설정
+            </h2>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- 주당 환자 수 -->
+                <div class="space-y-4">
+                    <label class="block text-lg font-semibold text-gray-700">
+                        <i class="fas fa-users text-blue-600 mr-2"></i>주당 환자 수
+                    </label>
+                    <div class="slider-container">
+                        <div class="slider-value" id="weeklyPatientsValue">10명</div>
+                        <input type="range" id="weeklyPatients" min="5" max="20" value="10" 
+                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+                    <div class="text-sm text-gray-600 text-center">5명 ~ 20명</div>
+                </div>
+
+                <!-- 환자당 샷수 -->
+                <div class="space-y-4">
+                    <label class="block text-lg font-semibold text-gray-700">
+                        <i class="fas fa-syringe text-green-600 mr-2"></i>환자당 샷수
+                    </label>
+                    <select id="shotsPerPatient" class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none">
+                        <option value="300">300샷 (할인 0%)</option>
+                        <option value="600">600샷 (할인 17%)</option>
+                        <option value="900">900샷 (할인 27%)</option>
+                    </select>
+                </div>
+
+                <!-- 패키지 선택 -->
+                <div class="space-y-4">
+                    <label class="block text-lg font-semibold text-gray-700">
+                        <i class="fas fa-box text-purple-600 mr-2"></i>패키지 선택
+                    </label>
+                    <select id="packageType" class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none">
+                        <option value="standalone">슈링크 단독</option>
+                        <option value="implant">임플란트패키지+슈링크 2회 (100만원)</option>
+                        <option value="orthognathic">양악패키지+슈링크 2회 (500만원)</option>
+                        <option value="orthodontic">교정패키지+슈링크 2회 (600만원)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 핵심 지표 섹션 -->
+        <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg card-shadow p-6 metric-card">
+                <div class="text-center">
+                    <i class="fas fa-calendar-alt text-4xl text-red-500 mb-3"></i>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">투자 회수 기간</h3>
+                    <p class="text-3xl font-bold text-red-600" id="recoveryPeriod">2.0개월</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg card-shadow p-6 metric-card">
+                <div class="text-center">
+                    <i class="fas fa-won-sign text-4xl text-green-500 mb-3"></i>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">회수 후 월 순이익</h3>
+                    <p class="text-3xl font-bold text-green-600" id="monthlyProfit">1,057만원</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg card-shadow p-6 metric-card">
+                <div class="text-center">
+                    <i class="fas fa-chart-line text-4xl text-blue-500 mb-3"></i>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">연간 ROI</h3>
+                    <p class="text-3xl font-bold text-blue-600" id="annualROI">520%</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg card-shadow p-6 metric-card">
+                <div class="text-center">
+                    <i class="fas fa-money-bill-wave text-4xl text-purple-500 mb-3"></i>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">월 매출</h3>
+                    <p class="text-3xl font-bold text-purple-600" id="monthlyRevenue">1,200만원</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상세 정보 및 차트 섹션 -->
+        <div class="grid lg:grid-cols-2 gap-8 mb-8">
+            <!-- 현재 설정값 -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-info-circle text-indigo-600 mr-2"></i>현재 설정값
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span class="font-medium">주당 환자 수:</span>
+                        <span class="font-bold text-indigo-600" id="currentWeeklyPatients">10명</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span class="font-medium">월 시술 횟수:</span>
+                        <span class="font-bold text-indigo-600" id="monthlyTreatments">40회</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span class="font-medium">환자당 샷수:</span>
+                        <span class="font-bold text-green-600" id="currentShots">300샷</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span class="font-medium">선택 패키지:</span>
+                        <span class="font-bold text-purple-600" id="currentPackage">슈링크 단독</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-blue-50 rounded border-2 border-blue-200">
+                        <span class="font-medium">월 총 샷수:</span>
+                        <span class="font-bold text-blue-600" id="totalMonthlyShots">12,000샷</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 투자 정보 -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-money-check-alt text-green-600 mr-2"></i>투자 정보
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span class="font-medium">초기 투자비용:</span>
+                        <span class="font-bold text-red-600">2,443만원</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span class="font-medium">초기 제공 샷수:</span>
+                        <span class="font-bold text-blue-600">84,700샷</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span class="font-medium">추가 카트리지:</span>
+                        <span class="font-bold text-orange-600">12,000샷당 143만원</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-green-50 rounded border-2 border-green-200">
+                        <span class="font-medium">샷 소진 예상 기간:</span>
+                        <span class="font-bold text-green-600" id="shotDepletionPeriod">7.1개월</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 수익성 분석 차트 -->
+        <div class="bg-white rounded-lg card-shadow p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">
+                <i class="fas fa-chart-area text-indigo-600 mr-2"></i>월별 누적 수익 분석
+            </h3>
+            <div style="height: 400px;">
+                <canvas id="profitChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 수익성 요약 -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg p-8 mt-8 text-center">
+            <h2 class="text-2xl font-bold mb-4">💡 투자 수익성 요약</h2>
+            <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div>
+                    <div class="text-3xl font-bold mb-2" id="summaryRecovery">2.0개월</div>
+                    <div class="text-indigo-100">투자 회수 기간</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold mb-2" id="summaryMonthlyProfit">월 1,057만원</div>
+                    <div class="text-indigo-100">회수 후 순이익</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold mb-2" id="summaryAnnualProfit">연 1.27억원</div>
+                    <div class="text-indigo-100">연간 예상 순이익</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 기본 상수
+        const INITIAL_INVESTMENT = 24430000; // 2,443만원
+        const INITIAL_SHOTS = 84700; // 초기 제공 샷수
+        const CARTRIDGE_COST = 1430000; // 12,000샷당 143만원
+        const CARTRIDGE_SHOTS = 12000;
+
+        // 가격 정보
+        const SHOT_PRICES = {
+            300: 300000, // 30만원
+            600: 500000, // 50만원 (25만원 × 2, 17% 할인 적용)
+            900: 660000  // 66만원 (22만원 × 3, 27% 할인 적용)
+        };
+
+        const PACKAGE_BONUSES = {
+            standalone: 0,
+            implant: 1000000,    // 100만원
+            orthognathic: 5000000, // 500만원
+            orthodontic: 6000000   // 600만원
+        };
+
+        // 차트 변수
+        let profitChart;
+
+        // DOM 요소
+        const weeklyPatientsSlider = document.getElementById('weeklyPatients');
+        const weeklyPatientsValue = document.getElementById('weeklyPatientsValue');
+        const shotsPerPatientSelect = document.getElementById('shotsPerPatient');
+        const packageTypeSelect = document.getElementById('packageType');
+
+        // 이벤트 리스너
+        weeklyPatientsSlider.addEventListener('input', updateCalculations);
+        shotsPerPatientSelect.addEventListener('change', updateCalculations);
+        packageTypeSelect.addEventListener('change', updateCalculations);
+
+        // 슬라이더 값 업데이트
+        weeklyPatientsSlider.addEventListener('input', function() {
+            weeklyPatientsValue.textContent = this.value + '명';
+        });
+
+        function updateCalculations() {
+            const weeklyPatients = parseInt(weeklyPatientsSlider.value);
+            const shotsPerPatient = parseInt(shotsPerPatientSelect.value);
+            const packageType = packageTypeSelect.value;
+            
+            const monthlyPatients = weeklyPatients * 4;
+            const monthlyShots = monthlyPatients * shotsPerPatient;
+            
+            // 매출 계산
+            const shotRevenue = SHOT_PRICES[shotsPerPatient] * monthlyPatients;
+            const packageBonus = PACKAGE_BONUSES[packageType] * monthlyPatients;
+            const totalMonthlyRevenue = shotRevenue + packageBonus;
+            
+            // 운영 비용 (카트리지)
+            const monthlyCost = (monthlyShots / CARTRIDGE_SHOTS) * CARTRIDGE_COST;
+            const monthlyProfit = totalMonthlyRevenue - monthlyCost;
+            
+            // 투자 회수 기간
+            const recoveryPeriod = INITIAL_INVESTMENT / totalMonthlyRevenue;
+            
+            // ROI 계산
+            const annualProfit = monthlyProfit * 12;
+            const annualROI = (annualProfit / INITIAL_INVESTMENT) * 100;
+            
+            // 샷 소진 기간
+            const shotDepletionPeriod = INITIAL_SHOTS / monthlyShots;
+
+            // UI 업데이트
+            updateUI({
+                weeklyPatients,
+                monthlyPatients,
+                shotsPerPatient,
+                packageType,
+                monthlyShots,
+                totalMonthlyRevenue,
+                monthlyProfit,
+                recoveryPeriod,
+                annualROI,
+                shotDepletionPeriod,
+                annualProfit
+            });
+
+            // 차트 업데이트
+            updateChart(totalMonthlyRevenue, monthlyCost, recoveryPeriod);
+        }
+
+        function updateUI(data) {
+            // 현재 설정값
+            document.getElementById('currentWeeklyPatients').textContent = data.weeklyPatients + '명';
+            document.getElementById('monthlyTreatments').textContent = data.monthlyPatients + '회';
+            document.getElementById('currentShots').textContent = data.shotsPerPatient + '샷';
+            document.getElementById('totalMonthlyShots').textContent = data.monthlyShots.toLocaleString() + '샷';
+            
+            // 패키지 이름
+            const packageNames = {
+                standalone: '슈링크 단독',
+                implant: '임플란트패키지+슈링크 2회',
+                orthognathic: '양악패키지+슈링크 2회',
+                orthodontic: '교정패키지+슈링크 2회'
+            };
+            document.getElementById('currentPackage').textContent = packageNames[data.packageType];
+
+            // 핵심 지표
+            document.getElementById('recoveryPeriod').textContent = data.recoveryPeriod.toFixed(1) + '개월';
+            document.getElementById('monthlyProfit').textContent = Math.round(data.monthlyProfit / 10000).toLocaleString() + '만원';
+            document.getElementById('annualROI').textContent = Math.round(data.annualROI) + '%';
+            document.getElementById('monthlyRevenue').textContent = Math.round(data.totalMonthlyRevenue / 10000).toLocaleString() + '만원';
+            document.getElementById('shotDepletionPeriod').textContent = data.shotDepletionPeriod.toFixed(1) + '개월';
+
+            // 요약 섹션
+            document.getElementById('summaryRecovery').textContent = data.recoveryPeriod.toFixed(1) + '개월';
+            document.getElementById('summaryMonthlyProfit').textContent = '월 ' + Math.round(data.monthlyProfit / 10000).toLocaleString() + '만원';
+            document.getElementById('summaryAnnualProfit').textContent = '연 ' + (data.annualProfit / 100000000).toFixed(2) + '억원';
+        }
+
+        function updateChart(monthlyRevenue, monthlyCost, recoveryPeriod) {
+            const months = [];
+            const cumulativeProfit = [];
+            const monthlyProfitData = [];
+            
+            let cumulative = -INITIAL_INVESTMENT; // 초기 투자금을 마이너스로 시작
+            
+            for (let i = 1; i <= 12; i++) {
+                months.push(i + '개월');
+                const monthlyNet = monthlyRevenue - monthlyCost;
+                cumulative += monthlyNet;
+                cumulativeProfit.push(cumulative / 10000); // 만원 단위
+                monthlyProfitData.push(monthlyNet / 10000); // 만원 단위
+            }
+
+            const ctx = document.getElementById('profitChart').getContext('2d');
+            
+            if (profitChart) {
+                profitChart.destroy();
+            }
+
+            profitChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: '누적 순이익 (만원)',
+                        data: cumulativeProfit,
+                        borderColor: 'rgb(79, 70, 229)',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '월별 순이익 (만원)',
+                        data: monthlyProfitData,
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: false,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '월별 수익성 추이'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: '금액 (만원)'
+                            },
+                            grid: {
+                                color: function(context) {
+                                    if (context.tick.value === 0) {
+                                        return 'rgba(255, 0, 0, 0.5)'; // 손익분기점을 빨간 선으로
+                                    }
+                                    return 'rgba(0, 0, 0, 0.1)';
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '기간'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        // 초기 계산 실행
+        updateCalculations();
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"951212169a52fccf","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.6.2","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDo4WtsL9j2ugfFcRidjLukpCZYwImKRiVqjOLSH02Jtqs2mvvdQnN5uxiOxK1StXKudQfivFxu%2BE%2BrhbB7ERPYhAo6L%2Fbn%2FdRcVsZDMuiS4vZpsfnhCgHmIcmR9ktusKPN2OMeNuBg3AafiS%2FvAqkrAlIjNQ%2BDYvQYBAp7rndNCWgLckNEiLD%2FgCEZ0QdnuNEQQuwn6wcNxY%2FF7u%2BYslEBmr3iI5eXLtFspmSn88b5y1KvH7pHEJvoo2b6EVzOZ9CJh7TPJ3fgmWcejMRpEyqQwQrjedZd46mQU3YgfLmgEqeRjjQw7EzZSI1dKGogRW41FlFSD2j%2B33WYsOqKj0mWsr9o5EbPWlPqPfyJQHTa%2FfJcnCXoDGGc2P6%2FDUU%2Faufjt1oGGowVNcL5YfDKfs4GFYhCODI4b72s%2B1Ukkmdig23QZXajR0V8ydRPqu%2FqI148jwYEmYvn2KQxJM7NVVqcN0ynZG9OPQVLrzIynXYoFyq8z5%2B37QMImExpohGoMa60PrzrGFA4whMyB81fME1W8%3D";
+        window.__genspark_locale = "ko-KR";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDo4WtsL9j2ugfFcRidjLukpCZYwImKRiVqjOLSH02Jtqs2mvvdQnN5uxiOxK1StXKudQfivFxu+E+rhbB7ERPYhAo6L/bn/dRcVsZDMuiS4vZpsfnhCgHmIcmR9ktusKPN2OMeNuBg3AafiS/vAqkrAlIjNQ+DYvQYBAp7rndNCWgLckNEiLD/gCEZ0QdnuNEQQuwn6wcNxY/F7u+YslEBmr3iI5eXLtFspmSn88b5y1KvH7pHEJvoo2b6EVzOZ9CJh7TPJ3fgmWcejMRpEyqQwQrjedZd46mQU3YgfLmgEqeRjjQw7EzZSI1dKGogRW41FlFSD2j+33WYsOqKj0mWsr9o5EbPWlPqPfyJQHTa/fJcnCXoDGGc2P6/DUU/aufjt1oGGowVNcL5YfDKfs4GFYhCODI4b72s+1Ukkmdig23QZXajR0V8ydRPqu/qI148jwYEmYvn2KQxJM7NVVqcN0ynZG9OPQVLrzIynXYoFyq8z5+37QMImExpohGoMa60PrzrGFA4whMyB81fME1W8=";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
