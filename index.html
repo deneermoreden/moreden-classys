@@ -7,285 +7,184 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .card-shadow {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        .slider-track {
-            background: linear-gradient(to right, #667eea, #764ba2);
-        }
-    </style>
 </head>
 <body class="bg-gray-50 font-sans">
-    <div class="min-h-screen">
-        <!-- 헤더 -->
-        <div class="gradient-bg text-white py-6">
-            <div class="container mx-auto px-4">
-                <div class="text-center">
-                    <h1 class="text-3xl font-bold mb-2">
-                        <i class="fas fa-chart-line mr-3"></i>슈링크 유니버스 투자 수익 분석
-                    </h1>
-                    <p class="text-blue-100">치과 원장님을 위한 실시간 ROI 계산 대시보드</p>
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-6">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-bold text-center">슈링크 유니버스 투자 수익 분석</h1>
+            <p class="text-center mt-2 opacity-90">치과 원장님을 위한 실시간 ROI 계산 대시보드</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Controls Panel -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-6 text-gray-800">
+                    <i class="fas fa-sliders-h text-blue-500 mr-2"></i>
+                    주요 변수 설정
+                </h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">주당 환자 수: <span id="patientCount">7</span>명</label>
+                        <input type="range" id="patientSlider" min="3" max="25" value="7" class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">환자당 시술 샷수</label>
+                        <select id="shotsSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="300">300샷 (30만원)</option>
+                            <option value="600">600샷 (50만원)</option>
+                            <option value="900">900샷 (66만원)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">패키지 선택</label>
+                        <select id="packageSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="standalone">슈링크 단독</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Fixed Investment Info -->
+                <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="text-sm font-semibold text-blue-800 mb-3">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        고정 투자 비용
+                    </h3>
+                    <div class="text-sm text-blue-700 space-y-1">
+                        <div>장비 + 초기 카트리지: <span class="font-semibold">2,443만원</span></div>
+                        <div>초기 제공 샷수: <span class="font-semibold">84,700샷</span></div>
+                        <div>추가 카트리지: <span class="font-semibold">12,000샷당 143만원</span></div>
+                        <div class="text-xs mt-2 text-blue-600">※ 300샷당 원가: 3.6만원</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics Panel -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Key Metrics -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <div class="text-orange-500 text-2xl mb-2">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="text-sm text-gray-600">투자 회수 기간</div>
+                        <div class="text-2xl font-bold text-blue-600" id="recoveryPeriod">2.9개월</div>
+                        <div class="text-xs text-gray-500">장비값 완전 회수</div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <div class="text-green-500 text-2xl mb-2">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="text-sm text-gray-600">회수 후 월 순이익</div>
+                        <div class="text-2xl font-bold text-green-600" id="monthlyProfit">697만원</div>
+                        <div class="text-xs text-gray-500">카트리지 비용 차감</div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <div class="text-purple-500 text-2xl mb-2">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="text-sm text-gray-600">환자 1명당 순이익</div>
+                        <div class="text-2xl font-bold text-purple-600" id="profitPerPatient">25만원</div>
+                        <div class="text-xs text-gray-500">순 수익 금액</div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                        <div class="text-indigo-500 text-2xl mb-2">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="text-sm text-gray-600">연간 ROI</div>
+                        <div class="text-2xl font-bold text-indigo-600" id="annualROI">342%</div>
+                        <div class="text-xs text-gray-500">투자 대비 수익률</div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">
+                        <i class="fas fa-chart-area text-green-500 mr-2"></i>
+                        월별 누적 수익 추이
+                    </h3>
+                    <div style="height: 400px;">
+                        <canvas id="profitChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="container mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                <!-- 좌측: 변수 설정 패널 -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg card-shadow p-6">
-                        <h2 class="text-xl font-bold text-gray-800 mb-6">
-                            <i class="fas fa-sliders-h text-blue-600 mr-2"></i>변수 설정
-                        </h2>
-                        
-                        <!-- 주당 환자 수 -->
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                주당 환자 수: <span id="weeklyPatients" class="text-blue-600 font-bold">10</span>명
-                            </label>
-                            <input type="range" id="weeklyPatientsSlider" min="3" max="25" value="10" 
-                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-track">
-                            <div class="flex justify-between text-xs text-gray-500 mt-1">
-                                <span>3명</span>
-                                <span>25명</span>
-                            </div>
-                        </div>
-
-                        <!-- 환자당 샷수 -->
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">환자당 시술 샷수</label>
-                            <select id="shotsPerPatient" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="300">300샷 (30만원)</option>
-                                <option value="600">600샷 (50만원 - 17% 할인)</option>
-                                <option value="900">900샷 (66만원 - 27% 할인)</option>
-                            </select>
-                        </div>
-
-                        <!-- 패키지 선택 -->
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">패키지 선택</label>
-                            <select id="packageType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="standalone">슈링크 단독</option>
-                                <option value="implant">임플란트패키지+슈링크2회 (100만원)</option>
-                                <option value="orthodontic">양악패키지+슈링크2회 (500만원)</option>
-                                <option value="prosthetic">교정패키지+슈링크2회 (600만원)</option>
-                            </select>
-                        </div>
-
-                        <!-- 고정 비용 정보 -->
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <h3 class="font-semibold text-gray-800 mb-3">
-                                <i class="fas fa-info-circle text-blue-600 mr-2"></i>고정 투자 비용
-                            </h3>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span>장비 + 초기 카트리지:</span>
-                                    <span class="font-semibold">2,443만원</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span>초기 제공 샷수:</span>
-                                    <span class="font-semibold">84,700샷</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span>추가 카트리지:</span>
-                                    <span class="font-semibold">143만원/12,000샷</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Current Settings Display -->
+        <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold mb-4 text-gray-800">
+                <i class="fas fa-clipboard-list text-blue-500 mr-2"></i>
+                현재 설정값 요약
+            </h3>
+            <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 text-sm">
+                <div class="text-center">
+                    <div class="text-gray-600">주당 환자</div>
+                    <div class="font-semibold text-blue-600" id="currentPatients">7명</div>
                 </div>
-
-                <!-- 우측: 결과 표시 -->
-                <div class="lg:col-span-2">
-                    <!-- 핵심 지표 카드들 -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <!-- 투자 회수 기간 -->
-                        <div class="bg-white rounded-lg card-shadow p-6 text-center">
-                            <div class="text-3xl mb-2">⏰</div>
-                            <h3 class="text-lg font-semibold text-gray-800 mb-2">투자 회수 기간</h3>
-                            <div id="recoveryPeriod" class="text-3xl font-bold text-blue-600 pulse-animation">2.0개월</div>
-                            <p class="text-sm text-gray-600 mt-2">장비값 완전 회수</p>
-                        </div>
-
-                        <!-- 회수 후 월 순이익 -->
-                        <div class="bg-white rounded-lg card-shadow p-6 text-center">
-                            <div class="text-3xl mb-2">💰</div>
-                            <h3 class="text-lg font-semibold text-gray-800 mb-2">회수 후 월 순이익</h3>
-                            <div id="monthlyProfit" class="text-3xl font-bold text-green-600">1,057만원</div>
-                            <p class="text-sm text-gray-600 mt-2">카트리지 비용 제외</p>
-                        </div>
-
-                        <!-- 환자당 순이익 -->
-                        <div class="bg-white rounded-lg card-shadow p-6 text-center">
-                            <div class="text-3xl mb-2">👤</div>
-                            <h3 class="text-lg font-semibold text-gray-800 mb-2">환자 1명당 순이익</h3>
-                            <div id="profitPerPatient" class="text-3xl font-bold text-purple-600">26.4만원</div>
-                            <p class="text-sm text-gray-600 mt-2">회수 완료 후</p>
-                        </div>
-
-                        <!-- 연간 ROI -->
-                        <div class="bg-white rounded-lg card-shadow p-6 text-center">
-                            <div class="text-3xl mb-2">📈</div>
-                            <h3 class="text-lg font-semibold text-gray-800 mb-2">연간 ROI</h3>
-                            <div id="annualROI" class="text-3xl font-bold text-red-600">520%</div>
-                            <p class="text-sm text-gray-600 mt-2">투자 대비 수익률</p>
-                        </div>
-                    </div>
-
-                    <!-- 수익 추이 차트 -->
-                    <div class="bg-white rounded-lg card-shadow p-6 mb-8">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            <i class="fas fa-chart-area text-green-600 mr-2"></i>월별 누적 수익 추이
-                        </h3>
-                        <div style="height: 300px;">
-                            <canvas id="profitChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- 현재 설정값 요약 -->
-                    <div class="bg-white rounded-lg card-shadow p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            <i class="fas fa-calculator text-blue-600 mr-2"></i>현재 설정값 요약
-                        </h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                            <div class="bg-gray-50 rounded-lg p-3 text-center">
-                                <div class="text-xs text-gray-600">주당 환자</div>
-                                <div id="summaryWeekly" class="font-bold text-blue-600">10명</div>
-                            </div>
-                            <div class="bg-gray-50 rounded-lg p-3 text-center">
-                                <div class="text-xs text-gray-600">월 시술 횟수</div>
-                                <div id="summaryMonthly" class="font-bold text-blue-600">40회</div>
-                            </div>
-                            <div class="bg-gray-50 rounded-lg p-3 text-center">
-                                <div class="text-xs text-gray-600">환자당 샷수</div>
-                                <div id="summaryShots" class="font-bold text-blue-600">300샷</div>
-                            </div>
-                            <div class="bg-gray-50 rounded-lg p-3 text-center">
-                                <div class="text-xs text-gray-600">월 매출</div>
-                                <div id="summaryRevenue" class="font-bold text-green-600">1,200만원</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="text-center">
+                    <div class="text-gray-600">월 시술 횟수</div>
+                    <div class="font-semibold text-green-600" id="monthlyTreatments">28회</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-gray-600">환자당 샷수</div>
+                    <div class="font-semibold text-purple-600" id="currentShots">300샷</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-gray-600">월 총 샷수</div>
+                    <div class="font-semibold text-indigo-600" id="monthlyShots">8,400샷</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-gray-600">월 매출</div>
+                    <div class="font-semibold text-orange-600" id="monthlyRevenue">840만원</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-gray-600">카트리지 비용</div>
+                    <div class="font-semibold text-red-600" id="cartridgeCost">100만원</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let chart;
-        
-        // 패키지별 가격 정보
-        const packagePrices = {
-            standalone: { base: 0, shots: { 300: 300000, 600: 500000, 900: 660000 } },
-            implant: { base: 1000000, shots: { 300: 0, 600: 0, 900: 0 } },
-            orthodontic: { base: 5000000, shots: { 300: 0, 600: 0, 900: 0 } },
-            prosthetic: { base: 6000000, shots: { 300: 0, 600: 0, 900: 0 } }
+        // Constants
+        const EQUIPMENT_COST = 24430000; // 2,443만원
+        const INITIAL_SHOTS = 84700;
+        const CARTRIDGE_COST_PER_12K = 1430000; // 143만원
+        const SHOT_COST = CARTRIDGE_COST_PER_12K / 12000; // 샷당 원가
+
+        // Pricing tiers
+        const PRICING = {
+            300: 300000,  // 30만원
+            600: 500000,  // 50만원
+            900: 660000   // 66만원
         };
 
-        // 계산 함수
-        function calculateROI() {
-            const weeklyPatients = parseInt(document.getElementById('weeklyPatientsSlider').value);
-            const shotsPerPatient = parseInt(document.getElementById('shotsPerPatient').value);
-            const packageType = document.getElementById('packageType').value;
-            
-            const monthlyPatients = weeklyPatients * 4;
-            const monthlyShots = monthlyPatients * shotsPerPatient;
-            
-            // 매출 계산
-            let monthlyRevenue;
-            if (packageType === 'standalone') {
-                monthlyRevenue = monthlyPatients * packagePrices[packageType].shots[shotsPerPatient];
-            } else {
-                // 패키지의 경우 600샷 기준으로 계산 (2회 시술)
-                monthlyRevenue = monthlyPatients * packagePrices[packageType].base / 4; // 월 분할
-            }
-            
-            // 카트리지 비용 계산 (월별)
-            const monthlyCartridgeCost = Math.ceil(monthlyShots / 12000) * 1430000;
-            
-            // 순이익 계산
-            const monthlyNetProfit = monthlyRevenue - monthlyCartridgeCost;
-            
-            // 투자 회수 기간
-            const initialInvestment = 24430000;
-            const recoveryPeriod = initialInvestment / monthlyRevenue;
-            
-            // 환자당 순이익
-            const profitPerPatient = monthlyNetProfit / monthlyPatients;
-            
-            // 연간 ROI
-            const annualROI = (monthlyNetProfit * 12 / initialInvestment) * 100;
-            
-            return {
-                weeklyPatients,
-                monthlyPatients,
-                monthlyShots,
-                monthlyRevenue,
-                monthlyNetProfit,
-                recoveryPeriod,
-                profitPerPatient,
-                annualROI
-            };
-        }
+        // Chart instance
+        let profitChart;
 
-        // UI 업데이트 함수
-        function updateUI() {
-            const results = calculateROI();
-            
-            document.getElementById('weeklyPatients').textContent = results.weeklyPatients;
-            document.getElementById('recoveryPeriod').textContent = results.recoveryPeriod.toFixed(1) + '개월';
-            document.getElementById('monthlyProfit').textContent = Math.round(results.monthlyNetProfit / 10000) + '만원';
-            document.getElementById('profitPerPatient').textContent = Math.round(results.profitPerPatient / 10000) + '만원';
-            document.getElementById('annualROI').textContent = Math.round(results.annualROI) + '%';
-            
-            // 요약 정보 업데이트
-            document.getElementById('summaryWeekly').textContent = results.weeklyPatients + '명';
-            document.getElementById('summaryMonthly').textContent = results.monthlyPatients + '회';
-            document.getElementById('summaryShots').textContent = document.getElementById('shotsPerPatient').value + '샷';
-            document.getElementById('summaryRevenue').textContent = Math.round(results.monthlyRevenue / 10000) + '만원';
-            
-            updateChart(results);
-        }
+        // DOM Elements
+        const patientSlider = document.getElementById('patientSlider');
+        const shotsSelect = document.getElementById('shotsSelect');
+        const patientCount = document.getElementById('patientCount');
 
-        // 차트 업데이트 함수
-        function updateChart(results) {
-            const months = [];
-            const cumulativeProfit = [];
-            let cumulative = -24430000; // 초기 투자비용
-            
-            for (let i = 1; i <= 12; i++) {
-                months.push(i + '개월');
-                cumulative += results.monthlyRevenue;
-                if (cumulative > 0) {
-                    cumulative += results.monthlyNetProfit - results.monthlyRevenue;
-                }
-                cumulativeProfit.push(Math.round(cumulative / 10000));
-            }
-            
-            if (chart) {
-                chart.destroy();
-            }
-            
+        // Initialize chart
+        function initChart() {
             const ctx = document.getElementById('profitChart').getContext('2d');
-            chart = new Chart(ctx, {
+            profitChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: months,
+                    labels: [],
                     datasets: [{
-                        label: '누적 수익 (만원)',
-                        data: cumulativeProfit,
+                        label: '누적 순이익',
+                        data: [],
                         borderColor: 'rgb(59, 130, 246)',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         fill: true,
@@ -297,10 +196,10 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: false,
+                            beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return value + '만원';
+                                    return (value / 10000).toFixed(0) + '만원';
                                 }
                             }
                         }
@@ -314,13 +213,96 @@
             });
         }
 
-        // 이벤트 리스너
-        document.getElementById('weeklyPatientsSlider').addEventListener('input', updateUI);
-        document.getElementById('shotsPerPatient').addEventListener('change', updateUI);
-        document.getElementById('packageType').addEventListener('change', updateUI);
+        // Calculate metrics
+        function calculateMetrics() {
+            const weeklyPatients = parseInt(patientSlider.value);
+            const shotsPerPatient = parseInt(shotsSelect.value);
+            const monthlyPatients = weeklyPatients * 4;
+            const monthlyShots = monthlyPatients * shotsPerPatient;
+            
+            // Revenue calculation
+            const pricePerPatient = PRICING[shotsPerPatient];
+            const monthlyRevenue = monthlyPatients * pricePerPatient;
+            
+            // Cost calculation
+            const shotCost = monthlyShots * SHOT_COST;
+            const monthlyNetProfit = monthlyRevenue - shotCost;
+            
+            // Recovery period
+            const recoveryMonths = EQUIPMENT_COST / monthlyNetProfit;
+            
+            // Profit per patient
+            const profitPerPatient = pricePerPatient - (shotsPerPatient * SHOT_COST);
+            
+            // Annual ROI
+            const annualNetProfit = monthlyNetProfit * 12;
+            const annualROI = (annualNetProfit / EQUIPMENT_COST) * 100;
 
-        // 초기 로드
-        updateUI();
+            return {
+                weeklyPatients,
+                monthlyPatients,
+                shotsPerPatient,
+                monthlyShots,
+                monthlyRevenue,
+                shotCost,
+                monthlyNetProfit,
+                recoveryMonths,
+                profitPerPatient,
+                annualROI
+            };
+        }
+
+        // Update display
+        function updateDisplay() {
+            const metrics = calculateMetrics();
+            
+            // Update patient count
+            patientCount.textContent = metrics.weeklyPatients;
+            
+            // Update main metrics
+            document.getElementById('recoveryPeriod').textContent = metrics.recoveryMonths.toFixed(1) + '개월';
+            document.getElementById('monthlyProfit').textContent = Math.round(metrics.monthlyNetProfit / 10000) + '만원';
+            document.getElementById('profitPerPatient').textContent = Math.round(metrics.profitPerPatient / 10000) + '만원';
+            document.getElementById('annualROI').textContent = Math.round(metrics.annualROI) + '%';
+            
+            // Update current settings
+            document.getElementById('currentPatients').textContent = metrics.weeklyPatients + '명';
+            document.getElementById('monthlyTreatments').textContent = metrics.monthlyPatients + '회';
+            document.getElementById('currentShots').textContent = metrics.shotsPerPatient + '샷';
+            document.getElementById('monthlyShots').textContent = metrics.monthlyShots.toLocaleString() + '샷';
+            document.getElementById('monthlyRevenue').textContent = Math.round(metrics.monthlyRevenue / 10000) + '만원';
+            document.getElementById('cartridgeCost').textContent = Math.round(metrics.shotCost / 10000) + '만원';
+            
+            // Update chart
+            updateChart(metrics);
+        }
+
+        // Update chart data
+        function updateChart(metrics) {
+            const labels = [];
+            const data = [];
+            let cumulativeProfit = -EQUIPMENT_COST; // Start with negative equipment cost
+
+            for (let month = 1; month <= 12; month++) {
+                labels.push(month + '개월');
+                cumulativeProfit += metrics.monthlyNetProfit;
+                data.push(cumulativeProfit);
+            }
+
+            profitChart.data.labels = labels;
+            profitChart.data.datasets[0].data = data;
+            profitChart.update();
+        }
+
+        // Event listeners
+        patientSlider.addEventListener('input', updateDisplay);
+        shotsSelect.addEventListener('change', updateDisplay);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initChart();
+            updateDisplay();
+        });
     </script>
 </body>
 </html>
